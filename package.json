@@ -1,14 +1,18 @@
 {
   "name": "phalanx",
   "version": "0.0.1",
-  "description": "danmaku system",
+  "description": "danmaku engine",
   "main": "index.js",
   "dependencies": {
     "express": "^4.11.1",
-    "socket.io": "^1.3.2"
+    "socket.io": "^1.3.2",
+    "debug": "*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "*"
+  },
   "scripts": {
+    "start": "DEBUG=Chat:* nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,7 +23,7 @@
     "danmaku"
   ],
   "author": "Phalan-x",
-  "license": "Apache",
+  "license": "BSD",
   "bugs": {
     "url": "https://github.com/Phalan-x/Phalanx/issues"
   },
