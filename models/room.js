@@ -14,7 +14,7 @@ var roomSchema = new Schema({
 roomSchema.statics.getAll = function() {
 	var self = this;
 	return new Promise(function(resolve, reject) {
-		self.find({status: 1}, function(err, rooms) {
+		self.find({status: 1}).sort('-startTime').exec(function(err, rooms) {
 			if (err) reject(err);
 			else resolve(rooms);
 		});
