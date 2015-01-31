@@ -114,6 +114,7 @@ ul {
 .chatArea {
   height: 100%;
   padding-bottom: 60px;
+  position: relative;
 }
 
 .messages {
@@ -147,4 +148,17 @@ ul {
   position: absolute;
   right: 0;
   width: 100%;
+}
+
+/* 弹幕 */
+#time {
+  position: absolute;;
+  top: 0;
+  left: 0;
+  color: #333;
+  font-size: 14px;
+  z-index: 10;
+}
+#messages-stage {
+    background: #333;
 }
