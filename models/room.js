@@ -1,9 +1,6 @@
 var mongoose = require('mongoose');
-var config = require('../config');
 
 var Schema = mongoose.Schema;
-
-mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
 
 var roomSchema = new Schema({
 	title: String,
@@ -56,17 +53,17 @@ roomSchema.methods.uploadAndSave = function() {
 
 var RoomModel = mongoose.model('Room', roomSchema);
 
-var room = new RoomModel({
-	title: 'test50',
-	type:  1,
-	status: 1,
-	periodTime: 20000,
-	addition: ['gan', 1, 10]
-});
+// var room = new RoomModel({
+// 	title: 'test50',
+// 	type:  1,
+// 	status: 1,
+// 	periodTime: 20000,
+// 	addition: ['gan', 1, 10]
+// });
 
-room.uploadAndSave().then(function(result) {
-	console.log(result);
-});
+// room.uploadAndSave().then(function(result) {
+// 	console.log(result);
+// });
 
 // RoomModel.getAll().then(function(result) {
 // 	console.log(result);
