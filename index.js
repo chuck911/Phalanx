@@ -15,7 +15,7 @@ mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
 var log = Debug('Chat:server')
 
 server.listen(port, function () {
-  console.log('Server listening at port %d', port);
+  log('Server listening at port %d', port);
 });
 
 // Routing
@@ -23,6 +23,7 @@ app.use(express.static(__dirname + '/public'));
 app.use('/room/*', express.static(__dirname + '/public/index.html'));
 app.use('/wall/*', express.static(__dirname + '/public/danmu.html'));
 app.use('/rooms', express.static(__dirname + '/public/rooms.html'));
+app.use('/qrcode/*', express.static(__dirname + '/public/qrcode.html'));
 
 // Chatroom
 
@@ -53,7 +54,7 @@ io.on('connection', function (socket) {
         periodTime: 10000
       });
       room.uploadAndSave().then(function() {
-        console.log('add a room:' + socket.room);
+        log('add a room:' + socket.room);
       });
     });
     log(socket.username + ' join in room ' + data.room);
@@ -80,7 +81,7 @@ io.on('connection', function (socket) {
       roomTime: 0
     });
     boom.uploadAndSave().then(function(result) {
-      console.log('add one boom');
+      log('add one boom');
     });
     shout('new message', {
       username: socket.username,
