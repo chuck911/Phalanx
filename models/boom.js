@@ -1,9 +1,6 @@
 var mongoose = require('mongoose');
-var config = require('../config');
 
 var Schema = mongoose.Schema;
-
-mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
 
 var boomSchema = new Schema({
 	room: String,

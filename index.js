@@ -4,7 +4,13 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
-var Debug = require('debug')
+var Debug = require('debug');
+var mongoose = require('mongoose');
+var Boom = require('./models/boom');
+var Room = require('./models/room');
+var config = require('./config');
+
+mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
 
 var log = Debug('Chat:server')
 
@@ -37,7 +43,18 @@ io.on('connection', function (socket) {
   /* room */
   socket.on('in room', function(data) { 
     socket.join(data.room);
-    socket.room = data.room; 
+    socket.room = data.room;
+    Room.getOneByName(socket.room).then(function(result) {
+      if (result) return;
+      var room = new Room({
+        title: socket.room,
+        type: 1,
+        periodTime: 10000
+      });
+      room.uploadAndSave().then(function() {
+        console.log('add a room:' + socket.room);
+      });
+    })
     log(socket.username + ' join in room ' + data.room);
   })
 
@@ -49,6 +66,15 @@ io.on('connection', function (socket) {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
+    var boom = new Boom({
+      room: socket.room,
+      sender: socket.username,
+      content: data,
+      roomTime: 0
+    });
+    boom.uploadAndSave().then(function(result) {
+      console.log('add one boom');
+    });
     shout('new message', {
       username: socket.username,
       message: data

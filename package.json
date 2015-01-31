@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "^4.11.1",
     "socket.io": "^1.3.2",
-    "debug": "*"
+    "debug": "*",
+    "mongoose": "~3.8"
   },
   "devDependencies": {
     "nodemon": "*"
