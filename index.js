@@ -22,6 +22,7 @@ server.listen(port, function () {
 app.use(express.static(__dirname + '/public'));
 app.use('/room/*', express.static(__dirname + '/public/index.html'));
 app.use('/wall/*', express.static(__dirname + '/public/danmu.html'));
+app.use('/rooms', express.static(__dirname + '/public/rooms.html'));
 
 // Chatroom
 
@@ -54,13 +55,19 @@ io.on('connection', function (socket) {
       room.uploadAndSave().then(function() {
         console.log('add a room:' + socket.room);
       });
-    })
+    });
     log(socket.username + ' join in room ' + data.room);
-  })
+  });
 
   socket.on('exit room', function(data) { 
     socket.leave(data.room);
     socket.room = 'default'; 
+  });
+
+  socket.on('fetch rooms', function(data){
+    Room.getAll().then(function(result){
+      socket.emit('show rooms', result);
+    })
   })
 
   // when the client emits 'new message', this listens and executes
