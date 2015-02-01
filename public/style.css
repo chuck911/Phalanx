@@ -153,12 +153,12 @@ ul {
 
 /* 弹幕 */
 #time {
-  position: absolute;;
+  position: absolute;
   top: 0;
   left: 0;
-  color: #333;
+  color: #ddd;
   font-size: 14px;
-  z-index: 10;
+  z-index: 100;
 }
 #messages-stage {
   background: #333;
