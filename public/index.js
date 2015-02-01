@@ -2,10 +2,9 @@ $(function() {
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
-    '#e21400', '#91580f', '#f8a700', '#f78b00',
-    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-    '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
+    '#3c967c', '#7eb1b3', '#6f7da1'
   ];
+  window.lastMessageTime = Date.parse(new Date())
 
   // Initialize varibles
   var $window = $(window);
@@ -68,10 +67,12 @@ $(function() {
       $inputMessage.val('');
       addChatMessage({
         username: username,
-        message: message
+        message: message,
+        time: Date.parse(new Date()),
+        user: 'self'  
       });
       // tell server to execute 'new message' and send along one parameter
-      socket.emit('new message', message);
+      socket.emit('new message', {message:message});
     }
   }
 
@@ -81,6 +82,11 @@ $(function() {
     addMessageElement($el, options);
   }
 
+  function logTime(time, options) {
+    var $el = $('<li>').addClass('log time').text(time);
+    addMessageElement($el, options);
+  }
+ 
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
     // Don't fade the message in if there is an 'X was typing'
@@ -97,14 +103,42 @@ $(function() {
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
+
+    var $subInfoContainer = $('<div class="sub-info-container clearfix" />')
+        .append($usernameDiv)
+
+    var $messageContainer = $('<div class="message-container"/>').
+        append($messageBodyDiv)
+
     var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
-      .data('username', data.username)
-      .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+    var $messageDiv
+    if (data.user == 'self') {
+      $messageDiv = $('<li class="message right clearfix"/>')
+          .data('username', data.username)
+          .addClass(typingClass)
+          .append($subInfoContainer, $messageContainer);
+    } else {
+      $messageDiv = $('<li class="message clearfix"/>')
+          .data('username', data.username)
+          .addClass(typingClass)
+          .append($subInfoContainer, $messageContainer);
+    }
+
+    var originTime = new Date(data.time)
+    var timeDelta = data.time - window.lastMessageTime
+    var time = originTime.toTimeString().substring(0,5)
+
+    window.lastMessageTime = data.time
+
+    // 如果和上一条message时间超过5min，则显示时间
+    if (timeDelta >= 2000) {
+      logTime(time)
+    }
 
     addMessageElement($messageDiv, options);
   }
+
+
 
   // Adds the visual chat typing message
   function addChatTyping (data) {
@@ -214,6 +248,18 @@ $(function() {
       }
     }
   });
+
+  $('.submit').on('click', function() {
+    setUsername();
+  })
+  $('#send-icon').on('click', function() {
+    if (!username) return;
+    sendMessage();
+    socket.emit('stop typing');
+    typing = false;
+  })
+
+
 
   $inputMessage.on('input', function() {
     updateTyping();

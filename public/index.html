@@ -13,15 +13,32 @@
       <div class="chatArea">
         <ul class="messages"></ul>
       </div>
-      <input class="inputMessage" placeholder="Type here..."/>
+
+      <div class="input-message-container">
+        <input class="inputMessage" placeholder="输入文字..."/>
+        <svg version="1.1" id="send-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 1024 1024" enable-background="new 0 0 1024 1024" xml:space="preserve">
+          <path fill="#4bbc9c" d="M209.147-68.006l66.045 293.447 391.513 32.505 0.054 3.967-390.776 21.899-58.117 291.736 647.514-312.961z" transform="translate(0, 812) scale(1, -1)"/>
+        </svg>
+      </div>
     </li>
     <li class="login page">
+      <div class="chat-title">
+        <svg version="1.1" id="chat-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 1024 1024" enable-background="new 0 0 1024 1024" xml:space="preserve">
+          <path fill="#2fdda3" d="M608 812l-192 0c-229.76 0-416-186.24-416-416 0-148.864 78.816-278.496 196.384-352l-4.384 0 0-256 288 192 128 0c229.76 0 416 186.24 416 416s-186.24 416-416 416zM608 108l-128 0-160-96 0 113.632c-111.616 39.68-192 145.184-192 270.368 0 159.072 128.928 288 288 288l192 0c159.072 0 288-128.928 288-288s-128.928-288-288-288z" transform="translate(0, 812) scale(1, -1)"/>
+        </svg>
+      </div>
       <div class="form">
-        <h3 class="title">What's your nickname?</h3>
-        <input class="usernameInput" type="text" maxlength="14" />
+        <div class="p-line clearfix">
+          <h3 class="title">昵称:</h3>
+          <input class="usernameInput" type="text" maxlength="14" />
+        </div>
+        <div class="p-line">
+         <input class="submit" type="submit" value="登入">
+        </div>
       </div>
     </li>
   </ul>
+
 
   <script src="/jquery-1.10.2.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>

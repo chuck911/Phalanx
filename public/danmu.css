@@ -79,3 +79,13 @@
   font-family: "\5FAE\8F6F\96C5\9ED1";
   src:local('Microsoft YaHei');
 }
+
+#time {
+  position: fixed;
+  top: auto;
+  left: 10px;
+  bottom: 70px;
+  color: #ddd;
+  font-size: 16px;
+  z-index: 100;
+}
