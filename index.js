@@ -81,8 +81,6 @@ io.on('connection', function (socket) {
       time: data.time
     });
   });
-    });
-  });
 
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
