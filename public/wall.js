@@ -90,8 +90,7 @@ $(function() {
       } else {
         setUsername();
         inRoom();
-        // initCommentManager();
-        socket.emit('get messages');
+        initCommentManager();
       }
     }
   });
@@ -155,7 +154,7 @@ $(function() {
 
   function fire(text,time) {
     if (!CM) return;
-    CM.insert({
+    CM.send({
       "mode":1,
         "text":text,
         "stime":time,
