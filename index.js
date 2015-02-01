@@ -99,15 +99,16 @@ io.on('connection', function (socket) {
       room: socket.room,
       sender: socket.username,
       content: data.message,
-      roomTime: data.time
+      roomTime: data.roomTime
     });
     boom.uploadAndSave().then(function(result) {
       log('add one boom');
     });
     shout('new message', {
       username: socket.username,
-      message: data.message,
-      time: data.time
+      message: boom.content,
+      roomTime: boom.roomTime,
+      time: Date.parse(boom.time)
     });
   });
 
