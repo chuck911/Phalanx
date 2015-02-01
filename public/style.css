@@ -49,42 +49,86 @@ ul {
 /* Login Page */
 
 .login.page {
-  background-color: #000;
+  background-color: #fff;
+}
+.login.page .chat-title {
+  width: 91px;
+  height: 50px;
+  margin: 115px auto 0;
+  position: relative;
+}
+.login.page .chat-title strong {
+  width: 29px;
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 .login.page .form {
-  height: 100px;
-  margin-top: -100px;
-  position: absolute;
-
+  height: 82px;
+  overflow: hidden;
   text-align: center;
-  top: 50%;
-  width: 100%;
+  width: 260px;
+  margin: 20px auto;
+  border: 1px solid #2fdda3;
+  border-radius: 5px;
+}
+.login.page .p-line {
+  width: 260px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 auto;
+}
+.login.page .p-line:first-of-type {
+  border-bottom: 1px solid #eee;
+  background: #ffffff;
+}
+.login.page .p-line:last-of-type {
+  background: #2fdda3;
 }
 
 .login.page .form .usernameInput {
   background-color: transparent;
   border: none;
-  border-bottom: 2px solid #fff;
   outline: none;
-  padding-bottom: 15px;
-  text-align: center;
-  width: 400px;
-}
-
-.login.page .title {
-  font-size: 200%;
-}
-
-.login.page .usernameInput {
-  font-size: 200%;
-  letter-spacing: 3px;
+  text-align: left;
+  font-size: 18px;
+  width: 168px;
+  height: 25px;
+  line-height: 25px;
+  margin-top: 7px;
 }
 
 .login.page .title, .login.page .usernameInput {
-  color: #fff;
-  font-weight: 100;
+  color: #444;
+  float: left;
 }
+.login.page .title {
+  font-size: 18px;
+  width: 68px;
+  margin: 0;
+  font-weight: normal;
+  color: #176e51;
+}
+.login.page .submit {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 40px;
+  line-height: 40px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background: #2fdda3;
+  border: none;
+  font-size: 20px;
+  width: 250px;
+  padding: 0;
+  color: white;
+}
+
+
+
 
 /* Chat page */
 
@@ -104,7 +148,7 @@ ul {
 
 .log {
   color: gray;
-  font-size: 70%;
+  font-size: 12px;
   margin: 5px;
   text-align: center;
 }
@@ -113,19 +157,74 @@ ul {
 
 .chatArea {
   height: 100%;
-  padding-bottom: 60px;
-  position: relative;
+  padding-bottom: 32px;
+  overflow: scroll;
 }
 
 .messages {
   height: 100%;
   margin: 0;
   overflow-y: scroll;
-  padding: 10px 20px 10px 20px;
+  padding: 10px 10px;
 }
 
 .message.typing .messageBody {
   color: gray;
+}
+.sub-info-container {
+  font-size: 12px;
+}
+.sub-info-container .username {
+  font-size: 14px;
+}
+li.message {
+  margin-bottom: 5px;
+}
+.clearfix {
+  clear: both;
+  overflow: hidden;
+}
+li.message.right .message-container {
+  background: #2fdda3;
+  border: 1px solid #2fdda3;
+  color: white;
+  left: auto;
+  float: right;
+}
+li.message.right .message-container:after {
+  border-bottom: 5px solid #2fdda3;
+  left: auto;
+  right: 8px;
+}
+li.message.right .time, li.message.right .username {
+  float: right;
+}
+li.message.right .username {
+  color: #444;
+  padding-right: 0;
+  padding-left: 15px;
+}
+.message-container {
+  display: inline-block;
+  max-width: 70%;
+  border: 1px solid #eee;
+  background: #ececec;
+  color: #444;
+  padding: 5px 10px;
+  border-radius: 5px;
+  position: relative;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.message-container:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -10px;
+  border-bottom: 5px solid #ececec;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
 }
 
 .username {
@@ -135,19 +234,45 @@ ul {
   padding-right: 15px;
   text-align: right;
 }
+.time {
+  width: 60px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 5px;
+  background: #f9f9f9;
+  color: #666;
+  margin: 10px auto 0;
+}
 
 /* Input */
+.input-message-container {
+  position: fixed;
+  height: 41px;
+  line-height: 40px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+#send-icon {
+  position: fixed;
+  right: 0;
+  bottom: 1px;
+}
 
 .inputMessage {
-  border: 10px solid #000;
-  bottom: 0;
-  height: 60px;
-  left: 0;
+  border: 0;
+  border-top: 1px solid #eee;
+  bottom: 0px;
+  height: 40px;
+  line-height: 40px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   outline: none;
   padding-left: 10px;
-  position: absolute;
-  right: 0;
   width: 100%;
+  padding-right: 50px;
+  vertical-align: middle;
+  margin-top: -1px;
 }
 
 /* 弹幕 */
@@ -162,3 +287,6 @@ ul {
 #messages-stage {
     background: #333;
 }
+
+
+

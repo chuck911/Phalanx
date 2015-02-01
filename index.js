@@ -99,7 +99,8 @@ io.on('connection', function (socket) {
     });
     shout('new message', {
       username: socket.username,
-      message: data
+      message: data,
+      time: Date.parse(boom.time)
     });
   });
 
