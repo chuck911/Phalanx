@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Phalanx</title>
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/danmu.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="/component.css">
 </head>
 <body>
   <time id="time"></time>
@@ -14,7 +14,9 @@
       <div class="chatArea abp">
         <div class="messages container" id="messages-stage"></div>
       </div>
-      <input class="inputMessage" placeholder="Type here..."/>
+      <div class="input-wrap">
+        <input class="inputMessage" placeholder="Type here..."/>
+      </div>
     </li>
     <li class="login page">
       <div class="form">
@@ -27,6 +29,6 @@
   <script src="/jquery-1.10.2.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/CommentCoreLibrary.js"></script>
-  <script src="/danmu.js"></script>
+  <script src="/component.js"></script>
 </body>
 </html>

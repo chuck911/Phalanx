@@ -1,3 +1,66 @@
+(function($) {
+
+    $.fn.dragmove = function() {
+    
+        return this.each(function() {
+    
+            var $document = $(document),
+                $this = $(this),
+                active,
+                startX,
+                startY;
+            
+            $this.on('mousedown touchstart', function(e) {
+            
+                active = true;
+                startX = e.originalEvent.pageX - $this.offset().left;
+                startY = e.originalEvent.pageY - $this.offset().top;  
+                
+                if ('mousedown' == e.type)
+                    
+                    click = $this;
+                                    
+                if ('touchstart' == e.type)
+                
+                    touch = $this;
+                                    
+                if (window.mozInnerScreenX == null)
+                
+                    return false; 
+            });
+            
+            $document.on('mousemove touchmove', function(e) {
+                
+                if ('mousemove' == e.type && active)
+                
+                    click.offset({ 
+                    
+                        left: e.originalEvent.pageX - startX,
+                        top: e.originalEvent.pageY - startY 
+                    
+                    });
+                
+                if ('touchmove' == e.type && active)
+                
+                    touch.offset({
+                    
+                        left: e.originalEvent.pageX - startX,
+                        top: e.originalEvent.pageY - startY
+                        
+                    });
+                
+            }).on('mouseup touchend', function() {
+                
+                active = false;
+                
+            });   
+                                
+        });
+            
+    };
+
+})(jQuery);
+
 $(function() {
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
@@ -14,9 +77,6 @@ $(function() {
   var username;
   var connected = false;
   var $currentInput = $usernameInput.focus();
-
-  var startTime = 0, iVal = -1;
-  var playTime;
 
   var socket = io();
 
@@ -38,7 +98,7 @@ $(function() {
 
   function inRoom(){
       var parts = window.location.pathname.split('/')
-      if(parts.length >= 3 && parts[1] == 'danmu') {
+      if(parts.length >= 3 && parts[1] == 'wall') {
           socket.emit('in room', {room: parts[2]});
       }
   }
@@ -55,8 +115,9 @@ $(function() {
         username: username,
         message: message
       });
+      console.log(message);
       // tell server to execute 'new message' and send along one parameter
-      socket.emit('new message', {message:message, roomTime:playTime});
+      socket.emit('new message', message);
     }
   }
 
@@ -90,8 +151,7 @@ $(function() {
       } else {
         setUsername();
         inRoom();
-        // initCommentManager();
-        socket.emit('get messages');
+        initCommentManager();
       }
     }
   });
@@ -106,37 +166,35 @@ $(function() {
     $inputMessage.focus();
   });
 
-  socket.on('messages loaded', function (messages) {
-    var bullets = messages.map(function(message){
-      return {
-        "mode":1,
-        "text":message.content,
-        "stime":message.roomTime,
-        "size":25,
-        "color":0xffffff,
-        "dur":5000
-      }
-    });
-    initCommentManager(bullets);
-  });
 
   //begin 弹幕
-  function initCommentManager(bullets) {
-    if (!bullets) bullets = [
-      {
-        "mode":5,
-        "text":"Danmaku Engine Demo",
-        "stime":2000,
-        "size":25,
-        "color":0xffffff,
-        "dur":10000
-      }
-    ];
+  var startTime = 0, iVal = -1;
+  var playTime;
+  function initCommentManager() {
     var CM = new CommentManager(document.getElementById('messages-stage'));
     CM.init(); // 初始化
     window.CM = CM;
+    // 载入弹幕列表
+    var danmakuList = [
+        {
+            "mode":1,
+            "text":"Hello World",
+            "stime":0,
+            "size":25,
+            "color":0xffffff
+        }
+    ];
+    CM.load(danmakuList);
 
-    CM.load(bullets);
+    // 插入弹幕
+    var someDanmakuAObj = {
+        "mode":1,
+        "text":"Hello CommentCoreLibrary",
+        "stime":1000,
+        "size":30,
+        "color":0xff0000
+    };
+    CM.insert(someDanmakuAObj);
 
     // 启动播放弹幕（在未启动状态下弹幕不会移动）
     CM.start();
@@ -182,5 +240,5 @@ $(function() {
     addChatMessage(data);
   });
 
-  // $('.input-wrap, .chatArea').dragmove();
+  $('.input-wrap, .chatArea').dragmove();
 });

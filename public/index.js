@@ -1,11 +1,9 @@
 $(function() {
   var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
-    '#e21400', '#91580f', '#f8a700', '#f78b00',
-    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-    '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
+    '#3c967c', '#7eb1b3', '#6f7da1'
   ];
+  window.lastMessageTime = Date.parse(new Date())
 
   // Initialize varibles
   var $window = $(window);
@@ -20,20 +18,9 @@ $(function() {
   var username;
   var connected = false;
   var typing = false;
-  var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
   var socket = io();
-
-  function addParticipantsMessage (data) {
-    var message = '';
-    if (data.numUsers === 1) {
-      message += "there's 1 participant";
-    } else {
-      message += "there are " + data.numUsers + " participants";
-    }
-    log(message);
-  }
 
   // Sets the client's username
   function setUsername () {
@@ -68,7 +55,9 @@ $(function() {
       $inputMessage.val('');
       addChatMessage({
         username: username,
-        message: message
+        message: message,
+        time: Date.parse(new Date()),
+        user: 'self'  
       });
       // tell server to execute 'new message' and send along one parameter
       socket.emit('new message', {message:message});
@@ -81,15 +70,13 @@ $(function() {
     addMessageElement($el, options);
   }
 
+  function logTime(time, options) {
+    var $el = $('<li>').addClass('log time').text(time);
+    addMessageElement($el, options);
+  }
+ 
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
-    // Don't fade the message in if there is an 'X was typing'
-    var $typingMessages = getTypingMessages(data);
-    options = options || {};
-    if ($typingMessages.length !== 0) {
-      options.fade = false;
-      $typingMessages.remove();
-    }
 
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username)
@@ -97,27 +84,36 @@ $(function() {
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
-      .data('username', data.username)
-      .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+
+    var $subInfoContainer = $('<div class="sub-info-container clearfix" />')
+        .append($usernameDiv)
+
+    var $messageContainer = $('<div class="message-container"/>').
+        append($messageBodyDiv)
+
+    var $messageDiv
+    if (data.user == 'self') {
+      $messageDiv = $('<li class="message right clearfix"/>')
+          .data('username', data.username)
+          .append($subInfoContainer, $messageContainer);
+    } else {
+      $messageDiv = $('<li class="message clearfix"/>')
+          .data('username', data.username)
+          .append($subInfoContainer, $messageContainer);
+    }
+
+    var originTime = new Date(data.time)
+    var timeDelta = data.time - window.lastMessageTime
+    var time = originTime.toTimeString().substring(0,5)
+
+    window.lastMessageTime = data.time
+
+    // 如果和上一条message时间超过5min，则显示时间
+    if (timeDelta >= 2000) {
+      logTime(time)
+    }
 
     addMessageElement($messageDiv, options);
-  }
-
-  // Adds the visual chat typing message
-  function addChatTyping (data) {
-    data.typing = true;
-    data.message = 'is typing';
-    addChatMessage(data);
-  }
-
-  // Removes the visual chat typing message
-  function removeChatTyping (data) {
-    getTypingMessages(data).fadeOut(function () {
-      $(this).remove();
-    });
   }
 
   // Adds a message element to the messages and scrolls to the bottom
@@ -156,33 +152,6 @@ $(function() {
     return $('<div/>').text(input).text();
   }
 
-  // Updates the typing event
-  function updateTyping () {
-    if (connected) {
-      if (!typing) {
-        typing = true;
-        socket.emit('typing');
-      }
-      lastTypingTime = (new Date()).getTime();
-
-      setTimeout(function () {
-        var typingTimer = (new Date()).getTime();
-        var timeDiff = typingTimer - lastTypingTime;
-        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('stop typing');
-          typing = false;
-        }
-      }, TYPING_TIMER_LENGTH);
-    }
-  }
-
-  // Gets the 'X is typing' messages of a user
-  function getTypingMessages (data) {
-    return $('.typing.message').filter(function (i) {
-      return $(this).data('username') === data.username;
-    });
-  }
-
   // Gets the color of a username through our hash function
   function getUsernameColor (username) {
     // Compute hash code
@@ -206,7 +175,6 @@ $(function() {
     if (event.which === 13) {
       if (username) {
         sendMessage();
-        socket.emit('stop typing');
         typing = false;
       } else {
         setUsername();
@@ -215,9 +183,14 @@ $(function() {
     }
   });
 
-  $inputMessage.on('input', function() {
-    updateTyping();
-  });
+  $('.submit').on('click', function() {
+    setUsername();
+  })
+  $('#send-icon').on('click', function() {
+    if (!username) return;
+    sendMessage();
+    typing = false;
+  })
 
   // Click events
 
@@ -237,39 +210,14 @@ $(function() {
   socket.on('login', function (data) {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
-    log(message, {
-      prepend: true
-    });
-    addParticipantsMessage(data);
+    logTime((new Date()).toTimeString().substring(0,5))
+    var message = "欢迎来到聊天室";
+    log(message);
   });
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
     addChatMessage(data);
-  });
-
-  // Whenever the server emits 'user joined', log it in the chat body
-  socket.on('user joined', function (data) {
-    log(data.username + ' joined');
-    addParticipantsMessage(data);
-  });
-
-  // Whenever the server emits 'user left', log it in the chat body
-  socket.on('user left', function (data) {
-    log(data.username + ' left');
-    addParticipantsMessage(data);
-    removeChatTyping(data);
-  });
-
-  // Whenever the server emits 'typing', show the typing message
-  socket.on('typing', function (data) {
-    addChatTyping(data);
-  });
-
-  // Whenever the server emits 'stop typing', kill the typing message
-  socket.on('stop typing', function (data) {
-    removeChatTyping(data);
   });
 
   socket.on('show room', function(data){
