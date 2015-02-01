@@ -11,11 +11,21 @@ $(function() {
   var $chatPage = $('.chat.page'); // The chatroom page
 
   // Prompt for setting a username
-  var username;
+  var username = localStorage.username;
   var connected = false;
   var $currentInput = $usernameInput.focus();
 
   var socket = io();
+
+  var startTime = 0, iVal = -1;
+  var playTime;
+
+  if (username) {
+    $loginPage.hide();
+    $chatPage.show();
+    socket.emit('add user', username);
+    initRoom();
+  }
 
   // Sets the client's username
   function setUsername () {
@@ -23,6 +33,7 @@ $(function() {
 
     // If the username is valid
     if (username) {
+      // localStorage.username = username;
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
@@ -46,6 +57,7 @@ $(function() {
     // Prevent markup from being injected into the message
     message = cleanInput(message);
     // if there is a non-empty message and a socket connection
+    console.log('message && connected',message , connected);
     if (message && connected) {
       $inputMessage.val('');
       addChatMessage({
@@ -64,7 +76,7 @@ $(function() {
 
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
-    fire(data.message, playTime + 150);
+    fire(data.message, playTime + 500);
     console.log('chat message',data);
   }
 
@@ -86,11 +98,16 @@ $(function() {
         sendMessage();
       } else {
         setUsername();
-        inRoom();
-        initCommentManager();
+        initRoom();
       }
     }
   });
+
+  function initRoom() {
+    inRoom();
+    initCommentManager();
+    console.log('initRoom');
+  }
 
   // Focus input when clicking anywhere on login page
   $loginPage.click(function () {
@@ -104,36 +121,12 @@ $(function() {
 
 
   //begin 弹幕
-  var startTime = 0, iVal = -1;
-  var playTime;
   function initCommentManager() {
     var CM = new CommentManager(document.getElementById('messages-stage'));
     CM.init(); // 初始化
     window.CM = CM;
-    // 载入弹幕列表
-    var danmakuList = [
-        {
-            "mode":1,
-            "text":"Hello World",
-            "stime":0,
-            "size":25,
-            "color":0xffffff
-        }
-    ];
-    CM.load(danmakuList);
 
-    // 插入弹幕
-    var someDanmakuAObj = {
-        "mode":1,
-        "text":"Hello CommentCoreLibrary",
-        "stime":1000,
-        "size":30,
-        "color":0xff0000
-    };
-    CM.insert(someDanmakuAObj);
-
-    // 启动播放弹幕（在未启动状态下弹幕不会移动）
-    CM.start();
+    socket.emit('get messages');
 
     startTime = Date.now(); // 设定起始时间
     if(iVal >= 0){
@@ -143,20 +136,35 @@ $(function() {
     iVal = setInterval(function(){
       playTime = Date.now() - startTime; // 用起始时间和现在时间的差模拟播放
       CM.time(playTime); // 通报播放时间
-      document.getElementById('time').textContent = playTime; // 显示播放时间
+      showTime(playTime); // 显示播放时间
     }, 100); // 模拟播放器每 100ms 通报播放时间
   }
 
+  function showTime(time) {
+    // console.log('time',time);
+    var date = new Date(time);
+    $('#time').text(time);
+    // $('#time').text(format(date.getUTCHours()) + ':' + format(date.getMinutes()) + ':' + format(date.getSeconds()));
+    function format(num) {
+      var str = '0' + num;
+      return str.substr(str.length-2);
+    }
+  }
+
   function fire(text,time) {
+    console.log(CM);
     if (!CM) return;
+    console.log('time',playTime,time);
     CM.insert({
       "mode":1,
         "text":text,
         "stime":time,
         "size":25,
-        "color":0xffffff
+        "color":0xffffff,
+        "dur":5000
     });
   }
+  window.fire = fire;
   //end 弹幕
 
   // Socket events
@@ -173,6 +181,31 @@ $(function() {
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
+    console.log(data);
     addChatMessage(data);
   });
+
+  socket.on('messages loaded', function (messages) {
+    var bullets = messages.map(function(message){
+      return {
+        "mode":1,
+        "text":message.content,
+        "stime":message.roomTime,
+        "size":25,
+        "color":0xffffff,
+        "dur":5000
+      }
+    });
+    CM.load(bullets);
+    CM.send({
+        "mode":5,
+        "text":"Danmaku Engine Demo",
+        "stime":2000,
+        "size":25,
+        "color":0xffffff,
+        "dur":10000
+    });
+    CM.start();
+  });
+
 });

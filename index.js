@@ -81,6 +81,10 @@ io.on('connection', function (socket) {
       time: data.time
     });
   });
+
+  socket.on('get messages', function (data) {
+    Boom.getByRoom(socket.room).then(function(data){
+      socket.emit('messages loaded',data);
     });
   });
 
