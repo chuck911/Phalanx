@@ -53,30 +53,4 @@ roomSchema.methods.uploadAndSave = function() {
 
 var RoomModel = mongoose.model('Room', roomSchema);
 
-// var room = new RoomModel({
-// 	title: 'test50',
-// 	type:  1,
-// 	status: 1,
-// 	periodTime: 20000,
-// 	addition: ['gan', 1, 10]
-// });
-
-// room.uploadAndSave().then(function(result) {
-// 	console.log(result);
-// });
-
-// RoomModel.getAll().then(function(result) {
-// 	console.log(result);
-// });
-
-// RoomModel.getOneByName('test3').then(function(result) {
-// 	console.log(result);
-// })
-
-// RoomModel.close('test3').then(function(result) {
-// 	console.log(result);
-// })
-
-
-
 module.exports = RoomModel;

@@ -10,7 +10,14 @@ var Boom = require('./models/boom');
 var Room = require('./models/room');
 var config = require('./config');
 
-mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
+var connect = function() {
+  var options = { server: { socketOptions: { keepAlive: 1}}};
+  mongoose.connect('mongodb://' + config.host + '/' + config.dbname, options);
+};
+
+connect();
+mongoose.connection.on('error', console.log);
+mongoose.connection.on('disconnect', connect);
 
 var log = Debug('Chat:server')
 

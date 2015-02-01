@@ -32,14 +32,4 @@ boomSchema.statics.getByRoom = function(room) {
 
 var BoomModel = mongoose.model('Boom', boomSchema);
 
-// var boom = new BoomModel({
-// 	room: 'test3',
-// 	sender: '皇上',
-// 	content: '朕深居宫中'
-// });
-
-// boom.uploadAndSave().then(function(result) {
-// 	console.log(result);
-// });
-
 module.exports = BoomModel;
