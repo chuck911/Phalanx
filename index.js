@@ -15,13 +15,15 @@ mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
 var log = Debug('Chat:server')
 
 server.listen(port, function () {
-  console.log('Server listening at port %d', port);
+  log('Server listening at port %d', port);
 });
 
 // Routing
 app.use(express.static(__dirname + '/public'));
 app.use('/room/*', express.static(__dirname + '/public/index.html'));
 app.use('/wall/*', express.static(__dirname + '/public/danmu.html'));
+app.use('/rooms', express.static(__dirname + '/public/rooms.html'));
+app.use('/qrcode/*', express.static(__dirname + '/public/qrcode.html'));
 
 // Chatroom
 
@@ -44,23 +46,43 @@ io.on('connection', function (socket) {
   socket.on('in room', function(data) { 
     socket.join(data.room);
     socket.room = data.room;
-    Room.getOneByName(socket.room).then(function(result) {
-      if (result) return;
-      var room = new Room({
-        title: socket.room,
-        type: 1,
-        periodTime: 10000
-      });
-      room.uploadAndSave().then(function() {
-        console.log('add a room:' + socket.room);
-      });
-    })
+
+    Room.getOneByName(data.room).then(function(result) {
+        socket.emit('show room', result)
+    });
+
     log(socket.username + ' join in room ' + data.room);
-  })
+  });
 
   socket.on('exit room', function(data) { 
     socket.leave(data.room);
     socket.room = 'default'; 
+  });
+
+  socket.on('create room', function(data){
+    if (!data.title) {
+        socket.emit('error msg', '请填写名称先！');
+        return;
+    }
+
+    Room.getOneByName(data.title).then(function(result) {
+      if (result) {
+          socket.emit('error msg', '名称已存在！换一个试试～');
+          return;
+      }
+
+      var room = new Room(data);
+      room.uploadAndSave().then(function() {
+        log('add a room:' + room);
+        socket.emit('created room', room);
+      });
+    });
+  });
+
+  socket.on('fetch rooms', function(data){
+    Room.getAll().then(function(result){
+      socket.emit('show rooms', result);
+    })
   })
 
   // when the client emits 'new message', this listens and executes
@@ -73,7 +95,7 @@ io.on('connection', function (socket) {
       roomTime: data.time
     });
     boom.uploadAndSave().then(function(result) {
-      console.log('add one boom');
+      log('add one boom');
     });
     shout('new message', {
       username: socket.username,

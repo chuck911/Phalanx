@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phalanx Chatroom</title>
+</head>
+<body>
+  <div id="qrcodeCanvas"></div>
+  <script src="/jquery-1.10.2.min.js"></script>
+  <script src="/jquery.qrcode.min.js"></script>
+  <script>
+    var parts = window.location.pathname.split('/')
+    if(parts.length >= 3) {
+        $('#qrcodeCanvas').qrcode({
+          text: 'http://' + window.location.host + '/room/' + parts[2]
+        });   
+    }
+  </script>
+</body>
+</html>

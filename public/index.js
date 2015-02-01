@@ -271,4 +271,8 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+
+  socket.on('show room', function(data){
+    $('#room-info').html(data.title + ',' + data.type + ',' + data.periodTime + '<a href="/qrcode/'+ data.title +'">二维码</a>')    
+  });
 });
