@@ -10,7 +10,14 @@ var Boom = require('./models/boom');
 var Room = require('./models/room');
 var config = require('./config');
 
-mongoose.connect('mongodb://' + config.host + '/' + config.dbname);
+var connect = function() {
+  var options = { server: { socketOptions: { keepAlive: 1}}};
+  mongoose.connect('mongodb://' + config.host + '/' + config.dbname, options);
+};
+
+connect();
+mongoose.connection.on('error', console.log);
+mongoose.connection.on('disconnect', connect);
 
 var log = Debug('Chat:server')
 
@@ -91,15 +98,16 @@ io.on('connection', function (socket) {
     var boom = new Boom({
       room: socket.room,
       sender: socket.username,
-      content: data,
-      roomTime: 0
+      content: data.message,
+      roomTime: data.roomTime
     });
     boom.uploadAndSave().then(function(result) {
       log('add one boom');
     });
     shout('new message', {
       username: socket.username,
-      message: data,
+      message: boom.content,
+      roomTime: boom.roomTime,
       time: Date.parse(boom.time)
     });
   });
